@@ -16,10 +16,21 @@ class KalkulatorUntukInfix {
 
     static boolean isValid(String expr) {
         boolean expectOperand = true;
-        for (char c : expr.toCharArray()) {
+        int parenCount = 0;
+        for (int i = 0; i < expr.length(); i++) {
+            char c = expr.charAt(i);
             if (c == ' ') continue;
             if (Character.isDigit(c)) {
                 if (!expectOperand) return false;
+                expectOperand = false;
+            } else if (c == '(') {
+                parenCount++;
+                // setelah '(' selalu expect operand
+                expectOperand = true;
+            } else if (c == ')') {
+                if (expectOperand || parenCount == 0) return false;
+                parenCount--;
+                // setelah ')' expect operator
                 expectOperand = false;
             } else if (isOperator(c)) {
                 if (expectOperand) return false;
@@ -28,9 +39,8 @@ class KalkulatorUntukInfix {
                 return false;
             }
         }
-        return !expectOperand;
+        return (!expectOperand && parenCount == 0);
     }
-
     static String infixToPostfix(String expr) {
         
         StringBuilder result = new StringBuilder();
