@@ -32,14 +32,27 @@ class KalkulatorUntukInfix {
     }
 
     static String infixToPostfix(String expr) {
+        
         StringBuilder result = new StringBuilder();
         Stack<Character> stack = new Stack<>();
+
         for (char c : expr.toCharArray()) {
+            if (c == ' ') continue;
             if (Character.isDigit(c)) {
                 result.append(c);
+            } else if (c == '(') {
+                stack.push(c);
+                
+            } else if (c == ')') {
+                while (!stack.isEmpty() && stack.peek() != '(') {
+                    result.append(stack.pop());
+                    
+                }
+                stack.pop(); 
             } else if (isOperator(c)) {
                 while (!stack.isEmpty() && precedence(c) <= precedence(stack.peek())) {
                     result.append(stack.pop());
+                    
                 }
                 stack.push(c);
             }
@@ -48,19 +61,30 @@ class KalkulatorUntukInfix {
             result.append(stack.pop());
         }
         return result.toString();
+
+        
     }
 
+    // Konversi infix ke prefix via reverse
     static String infixToPrefix(String expr) {
-        StringBuilder input = new StringBuilder(expr).reverse();
-        char[] chars = input.toString().toCharArray();
-        for (int i = 0; i < chars.length; i++) {
-            if (chars[i] == '(') chars[i] = ')';
-            else if (chars[i] == ')') chars[i] = '(';
+        
+        StringBuilder sb = new StringBuilder(expr).reverse();
+    
+        for (int i = 0; i < sb.length(); i++) {
+            char c = sb.charAt(i);
+            if (c == '(') sb.setCharAt(i, ')');
+            else if (c == ')') sb.setCharAt(i, '(');
         }
-        String reversedExpr = new String(chars);
-        String postfix = infixToPostfix(reversedExpr);
+
+        
+        String reversed = sb.toString();
+        
+        String postfix = infixToPostfix(reversed);
         return new StringBuilder(postfix).reverse().toString();
+
+        
     }
+    
 
     static int evaluatePostfix(String expr) {
         Stack<Integer> stack = new Stack<>();
